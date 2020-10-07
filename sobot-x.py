@@ -121,8 +121,6 @@ def check_list_of_commands():
         return False
 
 
-# <-------------- WORK ON THIS PART  ------------------->
-
 # Read executed_command.txt file and check if it's executed already
 def check_executed_command():
     f = open("executed_command.txt", "r")
@@ -149,21 +147,6 @@ def replace_line(file_name, line_num, text):
     out.writelines(lines)
     out.close()
 
-
-# <--------------- MAIN FUNCTION AND IT'S WORKING --------------->
-# Executing the command from the latest email
-def executing():
-    if validate_sonos_command() and check_list_of_commands() and check_if_its_executed():
-        print(f"Executing {cmd}")
-        # Update the first the executed command on the executed_command.txt file
-        print(f"Adding {cmd} to the executed")
-        replace_line(f'executed_command.txt', 0, cmd)
-    else:
-        print("Do nothing")
-
-
-# Please workout on the checking the latest email function above and below are the Sonos related function
-##########################################################################################################
 
 # Fading out the volume and clearing queue function
 def fading_out():
@@ -217,3 +200,15 @@ def execution_time():
         play_christmas()
     else:
         print(current_time)
+
+
+# <--------------- MAIN FUNCTION AND IT'S WORKING --------------->
+# Executing the command from the latest email
+def executing():
+    if validate_sonos_command() and check_list_of_commands() and check_if_its_executed():
+        print(f"Executing {cmd}")
+        # Update the first the executed command on the executed_command.txt file
+        print(f"Adding {cmd} to the executed")
+        replace_line(f'executed_command.txt', 0, cmd)
+    else:
+        print("Do nothing")
