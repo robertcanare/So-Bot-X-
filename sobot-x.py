@@ -41,8 +41,8 @@ import email
 
 # Email credentials
 # account credentials
-username = "arjay.canare@gmail.com"
-password = "395240trebOr123"
+username = "sonos@gmail.com"
+password = "pass"
 
 # Email subjects into list
 email_subjects = []
