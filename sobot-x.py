@@ -41,8 +41,8 @@ import email
 
 # Email credentials
 # account credentials
-username = "sonos@gmail.com"
-password = "pass"
+username = "arjay.canare@gmail.com"
+password = "395240trebOr123"
 
 # Email subjects into list
 email_subjects = []
@@ -212,3 +212,10 @@ def executing():
         replace_line(f'executed_command.txt', 0, cmd)
     else:
         print("Do nothing")
+
+# <------------------ WORK ON THIS PART ------------------>
+# Create all the necessary function for Sonos, for example:
+# volume_down()
+# volume_up()
+# pause_song()
+# play_song()
