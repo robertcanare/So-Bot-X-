@@ -22,6 +22,14 @@
 # By Robert John P. Canare
 # Oct 24, 2020
 
+# Email instructions that Sonos can understand
+# > sonos volume down
+# > sonos volume up
+# > sonos pause song
+# > sonos play song
+# > sonos play christmas
+# > sonos play mellow
+
 # Time and SOCO module
 from time import sleep
 from datetime import datetime
@@ -34,7 +42,7 @@ import email
 # Email credentials
 # account credentials
 username = "sonos@gmail.com"
-password = "password"
+password = "pass"
 
 # Email subjects into list
 email_subjects = []
@@ -47,6 +55,8 @@ current_volume = my_zone.volume
 now = str(datetime.now().time())
 current_time = now[0:5]
 
+# Sonos commands
+list_of_commands = ["volume down", "volume up", "pause song", "play song", "play christmas", "play mellow"]
 
 
 # Read email subject function
@@ -76,19 +86,7 @@ def read_email():
 from_email_subs = read_email()
 
 
-# Check the latest email if executed already function
-def is_it_executed():
-    # Check the last 2 if it's the same
-    if from_email_subs[0] == from_email_subs[1]:
-        return False
-    else:
-        return True
-
-
 # Extracting the command on the from_email_subs[1]
-# The format should be:
-#        Sonos            volume               up/down
-# {valid sonos command}     {request}       {something}
 def extracting_command():
     command_string = str(from_email_subs[-1])
 
@@ -104,37 +102,64 @@ sonos_command = extracting_command()[1]
 sonos_value = extracting_command()[2]
 
 
-# Already executed command
-executed_commands = []
-
-
-#  Executing the command from the latest email
-def executing():
-    if is_it_executed():
-        if sonos_validation == "sonos":
-            # I need something that once it's executed it won't execute again
-            # WHAT IF ONCE NA EXECUTE NA IUUPDATE NYA YUNG LIST into NULL NA LANG??
-            if sonos_command == "volume":
-                print("Execute volume function")
-                # Tong part na to dapat once lang mag execute
-            elif sonos_command == "pause":
-                print("Execute pause function")
-                # Tong part na to dapat once lang mag execute
-            elif sonos_command == "play":
-                print("Execute play function")
-                # Tong part na to dapat once lang mag execute
-            elif sonos_command == "christmas":
-                print("Execute christmas function")
-                # Tong part na to dapat once lang mag execute
-            elif sonos_command == "mellow":
-                print("Execute mellow function")
-        else:
-            print("Nothing to be executed")
+# Check if it's a Sonos command
+def validate_sonos_command():
+    if sonos_validation == "sonos":
+        return True
     else:
         return False
 
 
-executing()
+cmd = f"{sonos_command} {sonos_value}"
+
+
+# Check if the command is in the list of commands
+def check_list_of_commands():
+    if cmd in list_of_commands:
+        return True
+    else:
+        return False
+
+
+# <-------------- WORK ON THIS PART  ------------------->
+
+# Read executed_command.txt file and check if it's executed already
+def check_executed_command():
+    f = open("executed_command.txt", "r")
+    executed_command = f.readline()
+    return executed_command
+
+
+executed = check_executed_command()
+
+
+# Check if the recent command is executed already
+def check_if_its_executed():
+    if cmd == executed:
+        return False
+    else:
+        return True
+
+
+# update the first line of the executed_command.txt file
+def replace_line(file_name, line_num, text):
+    lines = open(file_name, 'r').readlines()
+    lines[line_num] = text
+    out = open(file_name, 'w')
+    out.writelines(lines)
+    out.close()
+
+
+# <--------------- MAIN FUNCTION AND IT'S WORKING --------------->
+# Executing the command from the latest email
+def executing():
+    if validate_sonos_command() and check_list_of_commands() and check_if_its_executed():
+        print(f"Executing {cmd}")
+        # Update the first the executed command on the executed_command.txt file
+        print(f"Adding {cmd} to the executed")
+        replace_line(f'executed_command.txt', 0, cmd)
+    else:
+        print("Do nothing")
 
 
 # Please workout on the checking the latest email function above and below are the Sonos related function
@@ -182,20 +207,6 @@ def play_english_oldies():
     my_zone.play()
 
 
-# Choose manually
-def do_it_manually():
-    while True:
-        choice = input("Choose one! \nPress 1 and Enter for Christmas songs.\nPress 2 and Enter for Mellow songs.\n: ")
-        if choice == "1":
-            play_christmas()
-            print("Gotcha!")
-            break
-        else:
-            play_english_oldies()
-            print("Gotcha!")
-            break
-
-
 # Execution time function
 def execution_time():
     # 6:00 AM play english oldies songs
@@ -206,4 +217,3 @@ def execution_time():
         play_christmas()
     else:
         print(current_time)
-        # do_it_manually()
