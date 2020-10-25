@@ -1,34 +1,8 @@
 #!/usr/bin/env python3
 
-################################################################################
-# ______      _               _     _____            ______       _    __   __ #
-# | ___ \    | |             | |   /  ___|           | ___ \     | |   \ \ / / #
-# | |_/ /___ | |__   ___ _ __| |_  \ `--.  ___ ______| |_/ / ___ | |_   \ V /  #
-# |    // _ \| '_ \ / _ \ '__| __|  `--. \/ _ \______| ___ \/ _ \| __|  /   \  #
-# | |\ \ (_) | |_) |  __/ |  | |_  /\__/ / (_) |     | |_/ / (_) | |_  / /^\ \ #
-# \_| \_\___/|_.__/ \___|_|   \__| \____/ \___/      \____/ \___/ \__| \/   \/ #
-#                                                                              #
-#                                                                              #
-# _____                        ______       _                                  #
-# /  ___|                       | ___ \     | |                                #
-# \ `--.  ___  _ __   ___  ___  | |_/ / ___ | |_                               #
-# `--. \/ _ \| '_ \ / _ \/ __| | ___ \/ _ \| __|                               #
-# /\__/ / (_) | | | | (_) \__ \ | |_/ / (_) | |_                               #
-# \____/ \___/|_| |_|\___/|___/ \____/ \___/ \__|                              #
-################################################################################
-
-# This script will automate Sonos control
-# Sonos Bot Version X
+# This script will automate Sonos controls through email
 # By Robert John P. Canare
 # Oct 24, 2020
-
-# Email instructions that Sonos can understand
-# > sonos volume down
-# > sonos volume up
-# > sonos pause song
-# > sonos play song
-# > sonos play christmas
-# > sonos play mellow
 
 # Time and SOCO module
 from time import sleep
@@ -40,23 +14,21 @@ import imaplib
 import email
 
 # Email credentials
-# account credentials
 username = "sonos@gmail.com"
-password = "pass"
+password = "password"
 
 # Email subjects into list
 email_subjects = []
 
 # Sonos information
 my_zone = SoCo("172.16.8.10")
-current_volume = my_zone.volume
 
 # Time information
 now = str(datetime.now().time())
 current_time = now[0:5]
 
 # Sonos commands
-list_of_commands = ["volume down", "volume up", "pause song", "play song", "play christmas", "play mellow"]
+list_of_commands = ["play christmas", "play mellow"]
 
 
 # Read email subject function
@@ -82,7 +54,6 @@ def read_email():
     return [latest_email_1, latest_email]
 
 
-# Get the latest 2 email subject
 from_email_subs = read_email()
 
 
@@ -104,48 +75,27 @@ sonos_value = extracting_command()[2]
 
 # Check if it's a Sonos command
 def validate_sonos_command():
-    if sonos_validation == "sonos":
-        return True
+    cmd = f"{sonos_command} {sonos_value}"
+    if sonos_validation == "sonos" and cmd in list_of_commands:
+        return True, cmd
     else:
         return False
 
 
-cmd = f"{sonos_command} {sonos_value}"
-
-
-# Check if the command is in the list of commands
-def check_list_of_commands():
-    if cmd in list_of_commands:
-        return True
-    else:
-        return False
+cmd = validate_sonos_command()
 
 
 # Read executed_command.txt file and check if it's executed already
 def check_executed_command():
     f = open("executed_command.txt", "r")
     executed_command = f.readline()
-    return executed_command
-
-
-executed = check_executed_command()
-
-
-# Check if the recent command is executed already
-def check_if_its_executed():
-    if cmd == executed:
+    if cmd == executed_command:
+        file = open("executed_command.txt", "w")
+        file.writelines(cmd)
+        file.close()
         return False
     else:
-        return True
-
-
-# update the first line of the executed_command.txt file
-def replace_line(file_name, line_num, text):
-    lines = open(file_name, 'r').readlines()
-    lines[line_num] = text
-    out = open(file_name, 'w')
-    out.writelines(lines)
-    out.close()
+        return
 
 
 # Fading out the volume and clearing queue function
@@ -190,32 +140,10 @@ def play_english_oldies():
     my_zone.play()
 
 
-# Execution time function
-def execution_time():
-    # 6:00 AM play english oldies songs
-    if current_time == "12:01":
-        play_english_oldies()
-    # 7:28 AM play christmas songs
-    elif current_time == "12:00":
-        play_christmas()
-    else:
-        print(current_time)
-
-
-# <--------------- MAIN FUNCTION AND IT'S WORKING --------------->
-# Executing the command from the latest email
-def executing():
+# Endless loop
+while True:
     if validate_sonos_command() and check_list_of_commands() and check_if_its_executed():
-        print(f"Executing {cmd}")
-        # Update the first the executed command on the executed_command.txt file
-        print(f"Adding {cmd} to the executed")
-        replace_line(f'executed_command.txt', 0, cmd)
-    else:
-        print("Do nothing")
-
-# <------------------ WORK ON THIS PART ------------------>
-# Create all the necessary function for Sonos, for example:
-# volume_down()
-# volume_up()
-# pause_song()
-# play_song()
+        if sonos_value == "christmas":
+            play_christmas()
+        elif sonos_value == "mellow":
+            play_english_oldies()
